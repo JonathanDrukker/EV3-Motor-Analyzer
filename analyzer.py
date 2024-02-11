@@ -15,6 +15,11 @@ with open("Data/main.py.err.log", 'r') as f:
         data_time["duty"].append(lst[1])
         data_time["speed"].append(lst[2])
 
+    index = data_time['duty'].index(0)
+    data_time['time'] = data_time['time'][index:]
+    data_time['duty'] = data_time['duty'][index:]
+    data_time['speed'] = data_time['speed'][index:]
+
 lastTime, lastVel = data_time["time"][0], data_time["speed"][0]
 
 for time, vel in zip(data_time["time"][1:], data_time["speed"][1:]):
@@ -29,11 +34,8 @@ for time, vel in zip(data_time["time"][1:], data_time["speed"][1:]):
 
 data_time["acceleration"].insert(0, data_time["acceleration"][0])
 
-for i in range(100):
-    data_time["acceleration"][i] *= -1
-
 data_duty = {"time": [], "duty": [], "speed": [], "acceleration": []}
-for duty in range(-100, 101):
+for duty in range(101):
     startIndex = data_time["duty"].index(duty)
     if duty != 100:
         endIndex = data_time["duty"].index(duty+1)-1
@@ -54,9 +56,9 @@ for duty in range(-100, 101):
 
 Ks = max([i for i, x in enumerate(data_duty["speed"]) if x == 0])
 
-x1 = np.array(data_duty["speed"])
-x2 = np.array(data_duty["acceleration"])
-y = np.array(data_duty["duty"])
+x1 = np.array(data_duty["speed"])[Ks:]
+x2 = np.array(data_duty["acceleration"])[Ks:]
+y = np.array(data_duty["duty"])[Ks:]
 
 x = np.array((np.sign(x1), x1, x2)).T
 fit = sm.OLS(y, x).fit()
@@ -70,16 +72,15 @@ print(Ks, Kv, Ka)
 fig, (ax1, ax2, ax3) = plt.subplots(3, 1, figsize=(8, 12))
 
 ax1.plot(data_duty["duty"], data_duty["speed"])
-ax1.plot([Kv * x for x in data_duty["speed"]], data_duty["speed"])
+ax1.plot([Kv * x + Ks for x in data_duty["speed"][Ks:]], data_duty["speed"][Ks:])
 ax1.set_title('Duty-Velocity')
 
 ax2.plot(data_duty["duty"], data_duty["acceleration"])
-ax2.plot([Ka * x for x in data_duty["acceleration"]],
+ax2.plot([Ka * x + Ks for x in data_duty["acceleration"]],
          data_duty["acceleration"])
 ax2.set_title('Duty-Acceleration')
 
 ax3.plot(data_time["time"], data_time["speed"])
-ax3.plot(data_duty["time"], data_duty["acceleration"])
 ax3.set_title('Time-Velocity')
 
 plt.tight_layout()
