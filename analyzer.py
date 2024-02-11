@@ -72,7 +72,8 @@ print(Ks, Kv, Ka)
 fig, (ax1, ax2, ax3) = plt.subplots(3, 1, figsize=(8, 12))
 
 ax1.plot(data_duty["duty"], data_duty["speed"])
-ax1.plot([Kv * x + Ks for x in data_duty["speed"][Ks:]], data_duty["speed"][Ks:])
+ax1.plot([Kv * x + Ks for x in data_duty["speed"][Ks:]],
+         data_duty["speed"][Ks:])
 ax1.set_title('Duty-Velocity')
 
 ax2.plot(data_duty["duty"], data_duty["acceleration"])
