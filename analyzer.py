@@ -6,7 +6,7 @@ from math import copysign
 
 print("Starting...")
 
-with open("Data/main.py.err.log", 'r') as f:
+with open("main.py.err.log", 'r') as f:
 
     data_time = {"time": [], "duty": [], "speed": [], "acceleration": []}
 
